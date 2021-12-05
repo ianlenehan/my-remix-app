@@ -1,8 +1,13 @@
-import { Link, useLoaderData } from "remix";
+import { Link, useLoaderData, redirect } from "remix";
 
 import { getPosts } from "~/post";
+import { auth } from "~/utils/db.server";
 
 export let loader = () => {
+  if (!auth.currentUser) {
+    return redirect("/login");
+  }
+
   return getPosts();
 };
 

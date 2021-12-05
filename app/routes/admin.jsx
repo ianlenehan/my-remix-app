@@ -1,12 +1,17 @@
-import { Outlet, Link, useLoaderData } from "remix";
+import { Outlet, Link, useLoaderData, redirect } from "remix";
 import { getPosts } from "~/post";
 import adminStyles from "~/styles/admin.css";
+import { auth } from "~/utils/db.server";
 
 export let links = () => {
   return [{ rel: "stylesheet", href: adminStyles }];
 };
 
 export let loader = () => {
+  if (!auth.currentUser) {
+    return redirect("/login");
+  }
+
   return getPosts();
 };
 
@@ -20,7 +25,7 @@ export default function Admin() {
         <ul>
           {posts.map((post) => (
             <li key={post.slug}>
-              <Link to={post.slug}>{post.title}</Link>
+              <Link to={`/posts/${post.slug}`}>{post.title}</Link>
             </li>
           ))}
         </ul>
