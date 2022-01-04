@@ -8,16 +8,12 @@ function isValidPostAttributes(attributes) {
   return attributes?.title;
 }
 
-async function redirectInvalidUser(request) {
+export async function getPosts(request) {
   const sessionUser = await getUserSession(request);
 
   if (!sessionUser) {
     return redirect("/login");
   }
-}
-
-export async function getPosts(request) {
-  redirectInvalidUser(request);
 
   const querySnapshot = await db.collection("posts").get();
 
@@ -30,7 +26,11 @@ export async function getPosts(request) {
 }
 
 export async function getPost({ request, slug }) {
-  redirectInvalidUser(request);
+  const sessionUser = await getUserSession(request);
+
+  if (!sessionUser) {
+    return redirect("/login");
+  }
 
   const docSnapshot = await db.collection("posts").doc(slug).get();
   if (!docSnapshot.exists) {
@@ -46,7 +46,11 @@ export async function getPost({ request, slug }) {
 }
 
 export async function createPost({ slug, body, title, request }) {
-  redirectInvalidUser(request);
+  const sessionUser = await getUserSession(request);
+
+  if (!sessionUser) {
+    return redirect("/login");
+  }
 
   invariant(
     isValidPostAttributes({ title }),

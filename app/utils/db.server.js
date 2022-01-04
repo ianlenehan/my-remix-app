@@ -9,6 +9,7 @@ import {
   getAuth,
   signInWithEmailAndPassword,
   createUserWithEmailAndPassword,
+  signOut,
 } from "firebase/auth";
 
 require("dotenv").config();
@@ -48,6 +49,14 @@ async function signIn(email, password) {
   }
 }
 
+async function signOutFirebase() {
+  try {
+    await signOut(auth);
+  } catch (error) {
+    console.log("Error signing out", error.message);
+  }
+}
+
 async function createUser(email, password) {
   try {
     return createUserWithEmailAndPassword(email, password);
@@ -68,4 +77,12 @@ async function getSessionToken(idToken) {
 
 const db = getFirestore();
 
-export { auth, db, signIn, createUser, getSessionToken, getAdminAuth };
+export {
+  auth,
+  db,
+  signIn,
+  signOutFirebase,
+  createUser,
+  getSessionToken,
+  getAdminAuth,
+};

@@ -1,5 +1,5 @@
 import { createCookieSessionStorage, redirect } from "remix";
-import { getAdminAuth, getSessionToken } from "./db.server";
+import { getAdminAuth, getSessionToken, signOutFirebase } from "./db.server";
 
 require("dotenv").config();
 
@@ -46,4 +46,16 @@ async function getUserSession(request) {
   }
 }
 
-export { createUserSession, getUserSession };
+async function destroySession(request) {
+  const session = await storage.getSession(request.headers.get("Cookie"));
+  const newCookie = await storage.destroySession(session);
+
+  return redirect("/login", { headers: { "Set-Cookie": newCookie } });
+}
+
+async function signOut(request) {
+  await signOutFirebase();
+  return await destroySession(request);
+}
+
+export { createUserSession, getUserSession, signOut };

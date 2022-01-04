@@ -1,6 +1,5 @@
 import { Form, redirect } from "remix";
-import { signOut } from "firebase/auth";
-import { auth } from "~/utils/db.server";
+import { signOut, getUserSession } from "~/utils/session.server";
 
 export let meta = () => {
   return {
@@ -9,16 +8,18 @@ export let meta = () => {
   };
 };
 
-export let loader = () => {
-  if (!auth.currentUser) {
+export let loader = async ({ request }) => {
+  const sessionUser = await getUserSession(request);
+
+  if (!sessionUser) {
     return redirect("/login");
   }
 
   return null;
 };
 
-export let action = () => {
-  return signOut(auth);
+export let action = ({ request }) => {
+  return signOut(request);
 };
 
 // https://remix.run/guides/routing#index-routes
