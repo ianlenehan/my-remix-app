@@ -7,12 +7,8 @@ export let links = () => {
   return [{ rel: "stylesheet", href: adminStyles }];
 };
 
-export let loader = () => {
-  if (!auth.currentUser) {
-    return redirect("/login");
-  }
-
-  return getPosts();
+export let loader = ({ request }) => {
+  return getPosts(request);
 };
 
 export default function Admin() {

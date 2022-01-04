@@ -3,12 +3,8 @@ import { Link, useLoaderData, redirect } from "remix";
 import { getPosts } from "~/post";
 import { auth } from "~/utils/db.server";
 
-export let loader = () => {
-  if (!auth.currentUser) {
-    return redirect("/login");
-  }
-
-  return getPosts();
+export let loader = async ({ request }) => {
+  return getPosts(request);
 };
 
 export default function Posts() {

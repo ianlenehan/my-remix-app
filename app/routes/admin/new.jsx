@@ -17,7 +17,7 @@ export let action = async ({ request }) => {
     return errors;
   }
 
-  await createPost({ title, slug, body });
+  await createPost({ title, slug, body, request });
 
   return redirect("/admin");
 };

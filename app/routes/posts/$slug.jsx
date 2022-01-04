@@ -6,10 +6,10 @@ const parseBody = (str) => {
   return str.replace(/\n/g, "<br />");
 };
 
-export let loader = async ({ params }) => {
+export let loader = async ({ params, request }) => {
   invariant(params.slug, "expected params.slug");
 
-  return getPost(params.slug);
+  return getPost({ slug: params.slug, request });
 };
 
 export default function PostSlug() {

@@ -1,7 +1,7 @@
-import { Form, redirect, Link } from "remix";
-import { signInWithEmailAndPassword } from "firebase/auth";
+import { Form, Link } from "remix";
 
-import { auth } from "~/utils/db.server";
+import { signIn } from "~/utils/db.server";
+import { createUserSession } from "~/utils/session.server";
 
 export let action = async ({ request }) => {
   let formData = await request.formData();
@@ -9,9 +9,9 @@ export let action = async ({ request }) => {
   let email = formData.get("email");
   let password = formData.get("password");
 
-  await signInWithEmailAndPassword(auth, email, password);
-
-  return redirect("/posts");
+  const { user } = await signIn(email, password);
+  const token = await user.getIdToken();
+  return createUserSession(token, "/posts");
 };
 
 export default function Login() {
@@ -22,7 +22,7 @@ export default function Login() {
       <Form method="post">
         <p>
           <label>
-            Email
+            Email?
             <input type="email" name="email" />
           </label>
         </p>
