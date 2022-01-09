@@ -2,23 +2,23 @@ import { useActionData, redirect, Form, useTransition } from "remix";
 import { createPost } from "~/post";
 
 export let action = async ({ request }) => {
-  await new Promise((res) => setTimeout(res, 1000));
   let formData = await request.formData();
 
   let title = formData.get("title");
   let slug = formData.get("slug");
-  let markdown = formData.get("markdown");
+  let body = formData.get("body");
 
   let errors = {};
   if (!title) errors.title = true;
   if (!slug) errors.slug = true;
-  if (!markdown) errors.markdown = true;
+  if (!body) errors.body = true;
 
   if (Object.keys(errors).length) {
     return errors;
   }
 
-  await createPost({ title, slug, markdown });
+  const post = { title, slug, body };
+  await createPost({ request, post });
 
   return redirect("/admin");
 };
@@ -42,10 +42,10 @@ export default function NewPost() {
         </label>
       </p>
       <p>
-        <label htmlFor="markdown">Markdown</label>{" "}
-        {errors?.markdown && <em>Markdown is required</em>}
+        <label htmlFor="body">Body</label>{" "}
+        {errors?.body && <em>Body is required</em>}
         <br />
-        <textarea rows={20} name="markdown" />
+        <textarea rows={20} name="body" />
       </p>
       <p>
         <button type="submit">

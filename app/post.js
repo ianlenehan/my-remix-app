@@ -1,49 +1,50 @@
-import path from "path";
-import fs from "fs/promises";
-import parseFrontMatter from "front-matter";
-import invariant from "tiny-invariant";
-import { processMarkdown } from "@ryanflorence/md";
+import { redirect } from "remix";
 
-let postsPath = path.join(__dirname, "../posts");
+import { db } from "~/utils/db.server";
+import { getUserSession } from "./utils/session.server";
 
-function isValidPostAttributes(attributes) {
-  return attributes?.title;
+export async function getPosts(request) {
+  const sessionUser = await getUserSession(request);
+  if (!sessionUser) {
+    return redirect("/login");
+  }
+
+  const querySnapshot = await db.collection("posts").get();
+
+  const data = [];
+  querySnapshot.forEach((doc) => {
+    data.push({ ...doc.data(), id: doc.id });
+  });
+
+  return data;
 }
 
-export async function getPosts() {
-  let dir = await fs.readdir(postsPath);
-  return Promise.all(
-    dir.map(async (filename) => {
-      let file = await fs.readFile(path.join(postsPath, filename));
-      let { attributes } = parseFrontMatter(file.toString());
-      invariant(
-        isValidPostAttributes(attributes),
-        `${filename} has bad meta data!`
-      );
+export async function getPost({ request, slug }) {
+  const sessionUser = await getUserSession(request);
+  if (!sessionUser) {
+    return redirect("/login");
+  }
 
-      return {
-        slug: filename.replace(/\.md$/, ""),
-        title: attributes.title,
-      };
-    })
-  );
+  const docSnapshot = await db.collection("posts").doc(slug).get();
+
+  if (!docSnapshot.exists) {
+    throw Error("No such document exists");
+  } else {
+    const post = docSnapshot.data();
+    return post;
+  }
 }
 
-export async function getPost(slug) {
-  let filepath = path.join(postsPath, slug + ".md");
-  let file = await fs.readFile(filepath);
-  let { attributes, body } = parseFrontMatter(file.toString());
-  invariant(
-    isValidPostAttributes(attributes),
-    `Post ${filepath} is missing attributes`
-  );
-  let html = await processMarkdown(body);
+export async function createPost({ request, post }) {
+  const sessionUser = await getUserSession(request);
+  if (!sessionUser) {
+    return redirect("/login");
+  }
 
-  return { slug, html, title: attributes.title };
-}
+  const { title, body, slug } = post;
 
-export async function createPost(post) {
-  let md = `---\ntitle: ${post.title}\n---\n\n${post.markdown}`;
-  await fs.writeFile(path.join(postsPath, post.slug + ".md"), md);
-  return getPost(post.slug);
+  const docRef = db.collection("posts").doc(slug);
+  await docRef.set({ slug, body, title });
+
+  return getPost({ request, slug });
 }

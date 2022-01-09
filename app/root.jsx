@@ -85,13 +85,10 @@ function Layout({ children }) {
                 <Link to="/">Home</Link>
               </li>
               <li>
-                <a href="https://remix.run/docs">Remix Docs</a>
-              </li>
-              <li>
-                <a href="https://github.com/remix-run/remix">GitHub</a>
-              </li>
-              <li>
                 <Link to="/posts">Posts</Link>
+              </li>
+              <li>
+                <Link to="/admin">Admin</Link>
               </li>
             </ul>
           </nav>

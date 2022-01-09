@@ -2,8 +2,8 @@ import { Link, useLoaderData } from "remix";
 
 import { getPosts } from "~/post";
 
-export let loader = () => {
-  return getPosts();
+export let loader = ({ request }) => {
+  return getPosts(request);
 };
 
 export default function Posts() {
