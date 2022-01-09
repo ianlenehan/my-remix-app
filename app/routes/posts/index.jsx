@@ -1,9 +1,8 @@
-import { Link, useLoaderData, redirect } from "remix";
+import { Link, useLoaderData } from "remix";
 
 import { getPosts } from "~/post";
-import { auth } from "~/utils/db.server";
 
-export let loader = async ({ request }) => {
+export let loader = ({ request }) => {
   return getPosts(request);
 };
 

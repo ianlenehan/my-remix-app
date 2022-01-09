@@ -1,11 +1,12 @@
 import { createCookieSessionStorage, redirect } from "remix";
-import { getAdminAuth, getSessionToken, signOutFirebase } from "./db.server";
+
+import { getSessionToken, signOutFirebase, adminAuth } from "~/utils/db.server";
 
 require("dotenv").config();
 
 const sessionSecret = process.env.SESSION_SECRET;
 if (!sessionSecret) {
-  throw new Error("SESSION_SECRET must be set");
+  throw new Error("SESSION_SECRET must be set!");
 }
 
 const storage = createCookieSessionStorage({
@@ -27,6 +28,7 @@ async function createUserSession(idToken, redirectTo) {
   const token = await getSessionToken(idToken);
   const session = await storage.getSession();
   session.set("token", token);
+
   return redirect(redirectTo, {
     headers: {
       "Set-Cookie": await storage.commitSession(session),
@@ -38,8 +40,9 @@ async function getUserSession(request) {
   const cookieSession = await storage.getSession(request.headers.get("Cookie"));
   const token = cookieSession.get("token");
   if (!token) return null;
+
   try {
-    const tokenUser = await getAdminAuth().verifySessionCookie(token, true);
+    const tokenUser = await adminAuth.verifySessionCookie(token, true);
     return tokenUser;
   } catch (error) {
     return null;
@@ -58,4 +61,4 @@ async function signOut(request) {
   return await destroySession(request);
 }
 
-export { createUserSession, getUserSession, signOut };
+export { createUserSession, signOut, getUserSession };

@@ -9,7 +9,7 @@ const parseBody = (str) => {
 export let loader = async ({ params, request }) => {
   invariant(params.slug, "expected params.slug");
 
-  return getPost({ slug: params.slug, request });
+  return getPost({ request, slug: params.slug });
 };
 
 export default function PostSlug() {

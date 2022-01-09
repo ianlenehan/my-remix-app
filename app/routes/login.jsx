@@ -22,7 +22,7 @@ export default function Login() {
       <Form method="post">
         <p>
           <label>
-            Email?
+            Email
             <input type="email" name="email" />
           </label>
         </p>

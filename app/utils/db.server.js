@@ -1,14 +1,13 @@
-// Import the functions you need from the SDKs you need
 import admin from "firebase-admin";
 import {
-  initializeApp as initializeAdminApp,
   applicationDefault,
+  initializeApp as initializeAdminApp,
 } from "firebase-admin/app";
 import { initializeApp } from "firebase/app";
 import {
-  getAuth,
-  signInWithEmailAndPassword,
   createUserWithEmailAndPassword,
+  signInWithEmailAndPassword,
+  getAuth,
   signOut,
 } from "firebase/auth";
 
@@ -26,63 +25,36 @@ if (!admin.apps.length) {
   });
 }
 
+const db = admin.firestore();
+const adminAuth = admin.auth();
+
 let Firebase;
+
 if (!Firebase?.apps?.length) {
   Firebase = initializeApp(firebaseConfig);
 }
 
-function getFirestore() {
-  return admin.firestore();
-}
-
-function getAdminAuth() {
-  return admin.auth();
-}
-
-const auth = getAuth();
-
 async function signIn(email, password) {
-  try {
-    return signInWithEmailAndPassword(auth, email, password);
-  } catch (error) {
-    throw error;
-  }
+  const auth = getAuth();
+  return signInWithEmailAndPassword(auth, email, password);
 }
 
-async function signOutFirebase() {
-  try {
-    await signOut(auth);
-  } catch (error) {
-    console.log("Error signing out", error.message);
-  }
-}
-
-async function createUser(email, password) {
-  try {
-    return createUserWithEmailAndPassword(email, password);
-  } catch (error) {
-    throw error;
-  }
+async function signUp(email, password) {
+  const auth = getAuth();
+  return createUserWithEmailAndPassword(auth, email, password);
 }
 
 async function getSessionToken(idToken) {
-  const auth = admin.auth();
-  const decodedToken = await auth.verifyIdToken(idToken);
+  const decodedToken = await adminAuth.verifyIdToken(idToken);
   if (new Date().getTime() / 1000 - decodedToken.auth_time > 5 * 60) {
     throw new Error("Recent sign in required");
   }
   const twoWeeks = 60 * 60 * 24 * 14 * 1000;
-  return auth.createSessionCookie(idToken, { expiresIn: twoWeeks });
+  return adminAuth.createSessionCookie(idToken, { expiresIn: twoWeeks });
 }
 
-const db = getFirestore();
+async function signOutFirebase() {
+  await signOut(getAuth());
+}
 
-export {
-  auth,
-  db,
-  signIn,
-  signOutFirebase,
-  createUser,
-  getSessionToken,
-  getAdminAuth,
-};
+export { db, signUp, getSessionToken, signOutFirebase, signIn, adminAuth };

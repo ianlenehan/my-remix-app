@@ -14,7 +14,7 @@
     "@remix-run/serve": "^1.0.4",
     "@ryanflorence/md": "^7.0.1",
     "dotenv": "^10.0.0",
-    "firebase": "^9.5.0",
+    "firebase": "^9.6.1",
     "firebase-admin": "^10.0.1",
     "front-matter": "^4.0.2",
     "react": "^17.0.2",
